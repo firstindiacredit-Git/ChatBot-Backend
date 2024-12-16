@@ -1,3 +1,35 @@
+
+
+// const sendMessage = async (req, res) => {
+//     try {
+//         const { senderId, receiverId, content } = req.body;
+//         const attachment = req.file ? `/uploads/${req.file.filename}` : null;
+
+//         if (!mongoose.Types.ObjectId.isValid(senderId) || !mongoose.Types.ObjectId.isValid(receiverId)) {
+//             return res.status(400).json({ error: "Invalid senderId or receiverId" });
+//         }
+
+//         if (!content) {
+//             return res.status(400).json({ error: "Message content is required" });
+//         }
+
+//         const message = new Message({ senderId, receiverId, content, attachment });
+//         await message.save();
+
+//         // const io = req.app.get('io');
+//         // if (io) {
+//         //     io.to(receiverId).emit('receive_message', message);
+//         // }
+
+
+//         res.status(201).json({ message });
+//     } catch (error) {
+//         console.error("Error in sendMessage:", error.message);
+//         res.status(500).json({ error: "An error occurred while sending the message." });
+//     }
+// };
+
+
 const mongoose = require('mongoose');
 const Message = require('../models/Message');
 
@@ -14,14 +46,14 @@ const sendMessage = async (req, res) => {
             return res.status(400).json({ error: "Message content is required" });
         }
 
+        // Check for duplicate message
+        const existingMessage = await Message.findOne({ senderId, receiverId, content, attachment });
+        if (existingMessage) {
+            return res.status(409).json({ error: "Duplicate message" });
+        }
+
         const message = new Message({ senderId, receiverId, content, attachment });
         await message.save();
-
-        // const io = req.app.get('io');
-        // if (io) {
-        //     io.to(receiverId).emit('receive_message', message);
-        // }
-
 
         res.status(201).json({ message });
     } catch (error) {
