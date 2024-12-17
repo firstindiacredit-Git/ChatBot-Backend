@@ -104,7 +104,7 @@ const app = express();
 // Middleware for JSON parsing and CORS
 app.use(express.json());
 const corsOptions = {
-  origin: ['http://localhost:5173', 'http://localhost:5174'], // Allow both admin and user apps
+  origin: ['http://localhost:5173', 'http://localhost:5174' , 'https://chatbot-user.vercel.app','https://chatbot-admin-iota.vercel.app'], // Allow both admin and user apps
   credentials: true,
 };
 app.use(cors(corsOptions));
@@ -123,7 +123,7 @@ app.get("/", (req, res) => {
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: ['http://localhost:5173', 'http://localhost:5174'], // Allow both admin and user origins
+    origin: ['http://localhost:5173', 'http://localhost:5174','https://chatbot-user.vercel.app','https://chatbot-admin-iota.vercel.app'], // Allow both admin and user origins
     methods: ['GET', 'POST'],
     credentials: true,
   },
