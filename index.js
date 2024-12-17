@@ -148,13 +148,13 @@ io.on('connection', (socket) => {
 
     // Basic validation
     if (!senderId || !receiverId || !content.trim()) {
-      console.error('Invalid message data:', message);
+      //console.error('Invalid message data:', message);
       return;
     }
 
     // Emit the message to the receiver's room
     io.to(receiverId).emit('receive_message', message);
-    console.log(`Message from ${senderId} to ${receiverId}: ${content}`);
+    // console.log(`Message from ${senderId} to ${receiverId}: ${content}`);
   });
 
   // Handle user disconnecting
