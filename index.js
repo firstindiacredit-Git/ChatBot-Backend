@@ -131,13 +131,13 @@ const io = new Server(server, {
 
 // Socket.IO Event Handlers
 io.on('connection', (socket) => {
-  console.log('A user connected:', socket.id);
+ // console.log('A user connected:', socket.id);
 
   // Handle user joining a unique room
   socket.on('join_room', (userId) => {
     if (userId) {
       socket.join(userId); // Join room with user ID
-      console.log(`User ${userId} joined room ${userId}`);
+     // console.log(`User ${userId} joined room ${userId}`);
     }
   });
 
