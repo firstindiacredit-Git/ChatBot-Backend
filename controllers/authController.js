@@ -10,14 +10,14 @@ const generateToken = (user) => {
 
 // Authenticate User or Create Account
 exports.authUser = async (req, res) => {
-  const { name, phone } = req.body;
+  const { name,email, phone } = req.body;
 
   try {
     // Check if the user exists
     let user = await User.findOne({ phone });
     if (!user) {
       // Create a new user if not found
-      user = new User({ name, phone });
+      user = new User({ name,email, phone });
       await user.save();
     }
 

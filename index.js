@@ -131,13 +131,13 @@ const io = new Server(server, {
 
 // Socket.IO Event Handlers
 io.on('connection', (socket) => {
- // console.log('A user connected:', socket.id);
+  // console.log('A user connected:', socket.id);
 
   // Handle user joining a unique room
   socket.on('join_room', (userId) => {
     if (userId) {
       socket.join(userId); // Join room with user ID
-     // console.log(`User ${userId} joined room ${userId}`);
+      // console.log(`User ${userId} joined room ${userId}`);
     }
   });
 
@@ -146,20 +146,26 @@ io.on('connection', (socket) => {
     const { senderId, receiverId, content } = message;
 
 
+    // // Basic validation
+    // if (!senderId || !receiverId || !content.trim()) {
+    //   console.error('Invalid message data:', message);
+    //   return;
+    // }
+
     // Basic validation
-    if (!senderId || !receiverId || !content.trim()) {
-      //console.error('Invalid message data:', message);
+    if (!senderId || !receiverId || (!content?.trim() && !message.attachment)) {
+      // console.error('Invalid message data:', message);
       return;
-    }
+  }
 
     // Emit the message to the receiver's room
     io.to(receiverId).emit('receive_message', message);
-    // console.log(`Message from ${senderId} to ${receiverId}: ${content}`);
+    //  console.log(`Message from ${senderId} to ${receiverId}: ${content ||'Attachment'}`);
   });
 
   // Handle user disconnecting
   socket.on('disconnect', () => {
-    //console.log('User disconnected:', socket.id);
+    // console.log('User disconnected:', socket.id);
   });
 });
 
