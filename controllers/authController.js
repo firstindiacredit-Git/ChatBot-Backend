@@ -118,10 +118,14 @@ exports.getLiveUserCounts = async (req, res) => {
       websiteId: websiteId,
     });
 
-    // Count live users for the specific websiteId
-    const liveUserCount = Array.from(global.liveUsers.entries())
-      .filter(([_, userData]) => userData.websiteId === websiteId)
-      .length;
+    // // Count live users for the specific websiteId
+    // const liveUserCount = Array.from(global.liveUsers.entries())
+    //   .filter(([_, userData]) => userData.websiteId === websiteId)
+    //   .length;
+
+    const liveUserCount = Array.from(global.liveUsers.entries()).filter(([userId, id]) => id === websiteId).length;
+
+
 
     const todayLiveUserCount = liveUserCount;
     const last7DaysLiveUserCount = liveUserCount;

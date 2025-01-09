@@ -137,7 +137,16 @@ const corsOptions = {
   origin: ['http://localhost:5173', 'http://localhost:5174' , 'https://chatbot-user.vercel.app','https://chatbot-admin-iota.vercel.app'], // Allow both admin and user apps
   credentials: true,
 };
-app.use(cors(corsOptions));  
+app.use(cors(corsOptions)); 
+
+
+app.use((req, res, next) => {
+  res.setHeader(
+    'Permissions-Policy',
+    'geolocation=(self "https://chatbot-user.vercel.app")'
+  );
+  next();
+});
 
 // Serve uploaded files
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
@@ -161,11 +170,11 @@ const io = new Server(server, {
   },
 });
 
-const liveUsers = new Set();
-global.liveUsers = liveUsers;
-
-// const liveUsers = new Map(); // Using Map to store userId and websiteId as key-value pairs
+// const liveUsers = new Set();
 // global.liveUsers = liveUsers;
+
+const liveUsers = new Map(); // Using Map to store userId and websiteId as key-value pairs
+global.liveUsers = liveUsers;
 
 // Socket.IO Event Handlers
 io.on('connection', (socket) => {
@@ -173,10 +182,11 @@ io.on('connection', (socket) => {
 
   // Handle user joining a unique room
   socket.on('join_room', (userId,websiteId) => {
-    if (userId) {
+    if (userId && websiteId) {
       socket.join(userId); // Join room with user ID
-      global.liveUsers.add(userId,websiteId);
+      global.liveUsers.set(userId,websiteId);
       // console.log(`User ${userId} joined room ${userId} with websiteId ${websiteId}`);
+      io.emit('live_users_update', Array.from(global.liveUsers.keys()));
     }
   });
 
@@ -213,29 +223,30 @@ io.on('connection', (socket) => {
     //  console.log(`Message from ${senderId} to ${receiverId}: ${content ||'Attachment'}`);
   });
 
-  // Handle user disconnecting
-  socket.on('disconnect', () => {
-    liveUsers.forEach((user) => {
-      if (io.sockets.adapter.rooms.get(user.userId)?.size === 0) {
-        global.liveUsers.delete(user); // Remove from live users if no sockets remain
-        // console.log(`User ${user.userId} removed from live users on disconnect`);
-      }
-    });
-    //  console.log('User disconnected:', socket.id);
-    //  console.log('Current live users after disconnect:', Array.from(liveUsers));
-  });
-
-
+  // // Handle user disconnecting
   // socket.on('disconnect', () => {
-  //   global.liveUsers.forEach((websiteId, userId) => {
-  //     if (!io.sockets.adapter.rooms.has(userId)) { 
-  //       global.liveUsers.delete(userId); // Remove from live users if no active sockets remain
-  //       console.log(`User ${userId} removed from live users`);
+  //   liveUsers.forEach((user) => {
+  //     if (io.sockets.adapter.rooms.get(user.userId)?.size === 0) {
+  //       global.liveUsers.delete(user); // Remove from live users if no sockets remain
+  //       console.log(`User ${user.userId} removed from live users on disconnect`);
   //     }
   //   });
-  //   console.log('User disconnected:', socket.id);
-  //   console.log('Current live users:', Array.from(global.liveUsers.entries()));
+  //    console.log('User disconnected:', socket.id);
+  //    console.log('Current live users after disconnect:', Array.from(liveUsers));
   // });
+
+
+  socket.on('disconnect', () => {
+    global.liveUsers.forEach((websiteId, userId) => {
+      if (!io.sockets.adapter.rooms.has(userId)) { 
+        global.liveUsers.delete(userId); // Remove from live users if no active sockets remain
+        // console.log(`User ${userId} removed from live users`);
+      }
+    });
+    io.emit('live_users_update', Array.from(global.liveUsers.keys()));
+    // console.log('User disconnected:', socket.id);
+    // console.log('Current live users:', Array.from(global.liveUsers.entries()));
+  });
   
  
   // Handle user disconnecting
