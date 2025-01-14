@@ -12,6 +12,7 @@ const generateToken = (user) => {
 // Authenticate User or Create Account
 exports.authUser = async (req, res) => {
   const { name,email, phone,services,websiteId,location } = req.body;
+  //console.log(location);
 
   try {
     // Check if the user exists
@@ -24,6 +25,7 @@ exports.authUser = async (req, res) => {
       // Update services if the user already exists
       user.services = services;
       user.location = location;
+      
       await user.save();
     }
 
