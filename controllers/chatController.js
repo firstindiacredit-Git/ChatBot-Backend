@@ -52,10 +52,10 @@ const sendMessage = async (req, res) => {
         }
 
         // Check for duplicate message
-        const existingMessage = await Message.findOne({ senderId, receiverId, content, attachment });
-        if (existingMessage) {
-            return res.status(409).json({ error: "Duplicate message" });
-        }
+        // const existingMessage = await Message.findOne({ senderId, receiverId, content, attachment });
+        // if (existingMessage) {
+        //     return res.status(409).json({ error: "Duplicate message" });
+        // }
 
          //const message = new Message({ senderId, receiverId, content, attachment });
         const message = new Message({ 
