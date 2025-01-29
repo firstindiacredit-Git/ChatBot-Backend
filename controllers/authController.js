@@ -1,8 +1,10 @@
 const User = require("../models/User");
 const Admin = require("../models/Admin");
+
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const Message = require("../models/Message");
+
 
 // Generate JWT Token (Unified function for both user and admin)
 const generateToken = (user) => {
@@ -40,6 +42,7 @@ exports.authUser = async (req, res) => {
 // Admin Signup
 exports.signupAdmin = async (req, res) => {
   const { username, email, password } = req.body;
+  const profileImage = req.file ? `/uploads/${req.file.filename}` : null;
 
   try {
     // Check if admin exists by email
@@ -56,6 +59,7 @@ exports.signupAdmin = async (req, res) => {
       username,
       email,
       password: hashedPassword,
+      profileImage
     });
 
     // Save admin to the database
@@ -83,7 +87,16 @@ exports.adminLogin = async (req, res) => {
     // Generate token for admin
     const token = generateToken(admin);
 
-    res.json({ token });
+    res.json({
+      message: "Login successful",
+      token,
+      admin: {
+        id: admin._id,
+        username: admin.username,
+        email: admin.email,
+        profileImage: admin.profileImage
+      }
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

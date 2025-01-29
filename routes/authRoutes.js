@@ -2,11 +2,12 @@ const express = require("express");
 const { authUser, adminLogin, signupAdmin, getTodayUsers, getLiveUsers, getTodayAndLast7DaysUsers, getLiveUserCounts } = require("../controllers/authController"); // Import signupAdmin
 const { getUsers } = require("../controllers/authController");
 const User = require("../models/User");
+const upload = require('../middlewares/upload');
 const router = express.Router();
 
 router.post("/user/auth", authUser); // User authentication or account creation
 router.post("/admin/login", adminLogin); // Admin login
-router.post("/admin/signup", signupAdmin); // Admin signup route
+router.post("/admin/signup",upload.single('profileImage'), signupAdmin); // Admin signup route
 router.get('/admin/users', getUsers);
 router.get('/admin/live-user-counts', getLiveUserCounts);
 router.get('/users', async (req, res) => {
